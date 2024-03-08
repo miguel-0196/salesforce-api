@@ -9,7 +9,7 @@ from simple_salesforce import Salesforce
 
 # External libraries
 from dotenv import load_dotenv
-from flask import Flask, request
+from flask import Flask, request, redirect
 
 # Load environment variables
 load_dotenv()
@@ -22,6 +22,7 @@ SALES_SECRET = os.getenv('SALES_CLIENT_SECRET')
 app = Flask(__name__)
 app.secret_key = os.urandom(24)
 
+
 # API routes
 @app.post("/get_oauth_url")
 def get_oauth_url():
@@ -31,6 +32,7 @@ def get_oauth_url():
         return {'statusCode': 200, 'body': url}
     except Exception as err:
         return {'statusCode': 405, 'body': str(err)}
+
 
 @app.post("/login_oauth_callback")
 def login_oauth_callback():
@@ -46,12 +48,107 @@ def login_oauth_callback():
             'client_secret': SALES_SECRET
         }).json()
 
-        if 'error' in response:
-            return {'statusCode': 406, 'body': str(response['error'])}
+        if 'error_description' in response:
+            return {'statusCode': 406, 'body': str(response['error_description'])}
 
         return {'statusCode': 200, 'access_token': response['access_token'], 'instance_url': response['instance_url']}
     except Exception as err:
         return {'statusCode': 405, 'body': str(err)}
+
+
+@app.post("/get_object_data")
+def get_object_data():
+    try:
+        access_token = request.form['access_token']
+        instance_url = request.form['instance_url']
+        object_name = request.form['object_name']
+        custom_object =  request.form['custom_object']
+        from_date = request.form['from_date'] or ''
+        to_date = request.form['to_date'] or ''
+
+        if custom_object == True:
+            query = 'SELECT+FIELDS(CUSTOM)+FROM+'+ object_name +'+WHERE+IsDeleted=False'
+        else:
+            query = 'SELECT+FIELDS(STANDARD)+FROM+'+ object_name +'+WHERE+IsDeleted=False'
+
+        if from_date != '' or to_date != '':
+            if from_date != '':
+                query += '+AND+LastModifiedDate>=' + from_date + 'T00:00:00Z'
+
+                if to_date != '':
+                    query += '+AND+LastModifiedDate<=' + to_date + 'T23:59:59Z'
+            else:
+                query += '+AND+LastModifiedDate<=' + to_date + 'T23:59:59Z'
+
+        headers = {
+            'Authorization': 'Bearer ' + access_token,
+            'Content-Encoding': 'gzip'
+        }
+
+        response = requests.get(instance_url + '/services/data/v59.0/query/?q=' + query, headers=headers)
+        return {'statusCode': 200, 'body': response.json()}
+    except Exception as err:
+        return {'statusCode': 405, 'body': str(err)}
+
+
+@app.post("/get_object_data_extra")
+def get_object_data_extra():
+    try:
+        access_token = request.form['access_token']
+        instance_url = request.form['instance_url']
+        next_records_url = request.form['next_records_url']
+
+        headers = {
+            'Authorization': 'Bearer ' + access_token,
+            'Content-Encoding': 'gzip'
+        }
+
+        response = requests.get(instance_url + next_records_url, headers=headers)
+        return {'statusCode': 200, 'body': response.json()}
+    except Exception as err:
+        return {'statusCode': 405, 'body': str(err)}
+
+
+@app.post("/create_custom_object")
+def create_custom_object():
+    try:
+        access_token = request.form['access_token']
+        instance_url = request.form['instance_url']
+        full_name = request.form['full_name']
+        label = request.form['label']
+        pluralLabel = request.form['pluralLabel']
+        fields = json.loads(request.form['fields'])
+
+        sf = Salesforce(instance_url=instance_url, session_id=access_token)
+        custom_object = sf.mdapi.CustomObject(
+            fullName = full_name,
+            label = label,
+            pluralLabel = pluralLabel,
+            nameField = sf.mdapi.CustomField(
+                label = "Name",
+                type = sf.mdapi.FieldType("Text")
+            ),
+            fields = fields,
+            deploymentStatus = sf.mdapi.DeploymentStatus("Deployed"),
+            sharingModel = sf.mdapi.SharingModel("Read")
+        )
+        sf.mdapi.CustomObject.create(custom_object)
+    
+        return {'statusCode': 200, 'body': 'Success'}
+    except Exception as err:
+        return {'statusCode': 405, 'body': str(err)}
+
+
+# Test route
+@app.route("/redirect")
+def redirect():
+    return redirect(request.args.get("oauth_url"))
+
+
+@app.route("/login/callback")
+def callback():
+    return request.args.get("code")
+
 
 if __name__ == '__main__':
     app.run(threaded=True, host=SERVICE_IP, port=SERVICE_PORT, ssl_context="adhoc")
