@@ -1,0 +1,5 @@
+requests
+Flask
+pyopenssl
+simple_salesforce
+python-dotenv
