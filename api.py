@@ -28,7 +28,7 @@ app.secret_key = os.urandom(24)
 def get_oauth_url():
     try:
         redirect_uri =  request.form['redirect_uri']
-        url = "https://login.salesforce.com/services/oauth2/authorize?response_type=code&client_id="+SALES_KEY+"&redirect_uri="+redirect_uri
+        url = "https://login.salesforce.com/services/oauth2/authorize?response_type=code&scope=refresh_token&client_id="+SALES_KEY+"&redirect_uri="+redirect_uri
         return {'statusCode': 200, 'body': url}
     except Exception as err:
         return {'statusCode': 405, 'body': str(err)}
@@ -52,6 +52,24 @@ def login_oauth_callback():
             return {'statusCode': 406, 'body': str(response['error_description'])}
 
         return {'statusCode': 200, 'access_token': response['access_token'], 'instance_url': response['instance_url']}
+    except Exception as err:
+        return {'statusCode': 405, 'body': str(err)}
+
+
+@app.post("/get_new_access_token")
+def get_new_access_token():
+    try:
+        refresh_token =  request.form['refresh_token']
+        data = {
+            'grant_type': 'refresh_token',
+            'refresh_token': refresh_token,
+            'client_id' : SALES_KEY,
+            'client_secret' : SALES_SECRET
+        }
+
+        uri_token_request = 'https://login.salesforce.com/services/oauth2/token'
+        response = requests.post(uri_token_request, data=data).json()
+        return {'statusCode': 200, 'body': response}
     except Exception as err:
         return {'statusCode': 405, 'body': str(err)}
 
