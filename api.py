@@ -38,23 +38,19 @@ def get_oauth_url():
 def login_oauth_callback():
     try:
         redirect_uri =  request.form['redirect_uri']
-        callback_code =  request.form['callback_code']
+        authorization_code =  request.form['authorization_code']
         uri_token_request = 'https://login.salesforce.com/services/oauth2/token'
         response = requests.post(uri_token_request, data={
             'grant_type': 'authorization_code',
-            'redirect_uri': redirect_uri,
-            'code': callback_code,
+            'code': authorization_code,
             'client_id': SALES_KEY,
-            'client_secret': SALES_SECRET
+            'client_secret': SALES_SECRET,
+            'redirect_uri': redirect_uri
         }).json()
 
-        if 'error_description' in response:
-            return {'statusCode': 406, 'body': str(response['error_description'])}
-
-        return {'statusCode': 200, 'access_token': response['access_token'], 'instance_url': response['instance_url']}
+        return {'statusCode': 200, 'body': response}
     except Exception as err:
         return {'statusCode': 405, 'body': str(err)}
-
 
 @app.post("/get_new_access_token")
 def get_new_access_token():
