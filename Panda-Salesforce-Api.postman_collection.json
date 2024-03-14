@@ -1,0 +1,267 @@
+{
+	"info": {
+		"_postman_id": "5ce9c651-b171-4e39-baf9-8479f62e6762",
+		"name": "Panda-Salesforce-Api",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "32303777"
+	},
+	"item": [
+		{
+			"name": "get_oauth_url",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "redirect_uri",
+							"value": "https://51.20.4.66:4445/login/callback",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "https://51.20.4.66:4445/get_oauth_url",
+					"protocol": "https",
+					"host": [
+						"51",
+						"20",
+						"4",
+						"66"
+					],
+					"port": "4445",
+					"path": [
+						"get_oauth_url"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "login_oauth_callback",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "redirect_uri",
+							"value": "https://51.20.4.66:4445/login/callback",
+							"type": "text"
+						},
+						{
+							"key": "authorization_code",
+							"value": "aPrx.f3G28C1uehwmBQ3uqiyEU0pTmb1Domfbmb_0SunzbrvogwRpCqFIHfNNHpnV7X8tSICtQ==",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "https://51.20.4.66:4445/login_oauth_callback",
+					"protocol": "https",
+					"host": [
+						"51",
+						"20",
+						"4",
+						"66"
+					],
+					"port": "4445",
+					"path": [
+						"login_oauth_callback"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "get_new_access_token",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "refresh_token",
+							"value": "5Aep861j70kdjF1ZXPgu4BLTSqKU5jTLATf6CHpQRiG5oViE34MGiKH3eUzSLmRTLl70NbB._M_fBSKKboat4gP",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "https://51.20.4.66:4445/get_new_access_token",
+					"protocol": "https",
+					"host": [
+						"51",
+						"20",
+						"4",
+						"66"
+					],
+					"port": "4445",
+					"path": [
+						"get_new_access_token"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "get_object_data",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "access_token",
+							"value": "00D1U000000rQga!AQsAQIXT2DQswGNpTdeG5.QBv7Dmauv_oqb0XeL3rBgezjpvPVtIQPpvr8MeAN7w8WiSF_AL.Dp3iXsdjtU87MM95bjhRPNE",
+							"type": "text"
+						},
+						{
+							"key": "instance_url",
+							"value": "https://d1u000000rqgauae-dev-ed.my.salesforce.com",
+							"type": "text"
+						},
+						{
+							"key": "object_name",
+							"value": "CustomObject3__c",
+							"type": "text"
+						},
+						{
+							"key": "from_date",
+							"value": "2024-02-06",
+							"type": "text"
+						},
+						{
+							"key": "to_date",
+							"value": "2024-09-06",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "https://51.20.4.66:4445/get_object_data",
+					"protocol": "https",
+					"host": [
+						"51",
+						"20",
+						"4",
+						"66"
+					],
+					"port": "4445",
+					"path": [
+						"get_object_data"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "create_custom_object",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "access_token",
+							"value": "00D1U000000rQga!AQsAQIXT2DQswGNpTdeG5.QBv7Dmauv_oqb0XeL3rBgezjpvPVtIQPpvr8MeAN7w8WiSF_AL.Dp3iXsdjtU87MM95bjhRPNE",
+							"type": "text"
+						},
+						{
+							"key": "instance_url",
+							"value": "https://d1u000000rqgauae-dev-ed.my.salesforce.com",
+							"type": "text"
+						},
+						{
+							"key": "full_name",
+							"value": "CustomObject3__c",
+							"type": "text"
+						},
+						{
+							"key": "label",
+							"value": "CustomObject 3",
+							"type": "text"
+						},
+						{
+							"key": "pluralLabel",
+							"value": "CustomObject 3",
+							"type": "text"
+						},
+						{
+							"key": "fields",
+							"value": "[{\n    \"fullName\": \"CustomField1__c\",\n    \"label\": \"CustomField1\",\n    \"type\": \"Text\",\n    \"length\": 255,\n    \"required\": true\n},\n{\n    \"fullName\": \"CustomField2__c\",\n    \"label\": \"CustomField2\",\n    \"type\": \"Text\",\n    \"length\": 255,\n    \"required\": true\n}]",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "https://51.20.4.66:4445/create_custom_object",
+					"protocol": "https",
+					"host": [
+						"51",
+						"20",
+						"4",
+						"66"
+					],
+					"port": "4445",
+					"path": [
+						"create_custom_object"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "upload_object_data",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "access_token",
+							"value": "00D1U000000rQga!AQsAQIXT2DQswGNpTdeG5.QBv7Dmauv_oqb0XeL3rBgezjpvPVtIQPpvr8MeAN7w8WiSF_AL.Dp3iXsdjtU87MM95bjhRPNE",
+							"type": "text"
+						},
+						{
+							"key": "instance_url",
+							"value": "https://d1u000000rqgauae-dev-ed.my.salesforce.com",
+							"type": "text"
+						},
+						{
+							"key": "object_name",
+							"value": "CustomObject3__c",
+							"type": "text"
+						},
+						{
+							"key": "data",
+							"value": "[\n  {\"CustomField1__c\":\"Smith3\", \"CustomField2__c\":\"Jones30\"},\n  {\"CustomField1__c\":\"Jones3\", \"CustomField2__c\":\"Jones31\"}\n]",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "https://51.20.4.66:4445/upload_object_data",
+					"protocol": "https",
+					"host": [
+						"51",
+						"20",
+						"4",
+						"66"
+					],
+					"port": "4445",
+					"path": [
+						"upload_object_data"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
