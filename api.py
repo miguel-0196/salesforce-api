@@ -126,6 +126,21 @@ def create_custom_object():
         return str(err), 405
 
 
+@app.post("/upload_object_data")
+def upload_object_data():
+    try:
+        instance_url = request.form['instance_url']
+        access_token = request.form['access_token']
+        object_name = request.form['object_name']
+        data = json.loads(request.form['data'])
+
+        sf = Salesforce(instance_url=instance_url, session_id=access_token)
+        obj = getattr(sf.bulk, object_name)
+        return obj.insert(data, batch_size=10000)
+    except Exception as err:
+        return str(err), 405
+
+
 # Test route
 @app.route("/redirect")
 def redirect():
