@@ -33,7 +33,6 @@ def get_oauth_url():
     except Exception as err:
         return {'statusCode': 405, 'body': str(err)}
 
-
 @app.post("/login_oauth_callback")
 def login_oauth_callback():
     try:
@@ -73,54 +72,29 @@ def get_new_access_token():
 @app.post("/get_object_data")
 def get_object_data():
     try:
-        access_token = request.form['access_token']
         instance_url = request.form['instance_url']
+        access_token = request.form['access_token']
         object_name = request.form['object_name']
-        custom_object =  request.form['custom_object']
-        from_date = request.form['from_date'] or ''
-        to_date = request.form['to_date'] or ''
+        from_date = request.form['from_date'] if 'from_date' in request.form else '' # 2024-02-06
+        to_date = request.form['to_date'] if 'to_date' in request.form else ''
 
+        custom_object = True if object_name.endswith('__c') else False
         if custom_object == True:
-            query = 'SELECT+FIELDS(CUSTOM)+FROM+'+ object_name +'+WHERE+IsDeleted=False'
+            query = 'SELECT FIELDS(CUSTOM)'
         else:
-            query = 'SELECT+FIELDS(STANDARD)+FROM+'+ object_name +'+WHERE+IsDeleted=False'
+            query = 'SELECT FIELDS(STANDARD)'
 
-        if from_date != '' or to_date != '':
-            if from_date != '':
-                query += '+AND+LastModifiedDate>=' + from_date + 'T00:00:00Z'
+        query += f' FROM {object_name} WHERE IsDeleted=False'
+        if from_date != '':
+            query += f' AND LastModifiedDate>={from_date}T00:00:00Z'
 
-                if to_date != '':
-                    query += '+AND+LastModifiedDate<=' + to_date + 'T23:59:59Z'
-            else:
-                query += '+AND+LastModifiedDate<=' + to_date + 'T23:59:59Z'
+        if to_date != '':
+            query += f' AND LastModifiedDate<={to_date}T23:59:59Z'
 
-        headers = {
-            'Authorization': 'Bearer ' + access_token,
-            'Content-Encoding': 'gzip'
-        }
-
-        response = requests.get(instance_url + '/services/data/v59.0/query/?q=' + query, headers=headers)
-        return {'statusCode': 200, 'body': response.json()}
+        sf = Salesforce(instance_url=instance_url, session_id=access_token)
+        return sf.query_all(query)
     except Exception as err:
-        return {'statusCode': 405, 'body': str(err)}
-
-
-@app.post("/get_object_data_extra")
-def get_object_data_extra():
-    try:
-        access_token = request.form['access_token']
-        instance_url = request.form['instance_url']
-        next_records_url = request.form['next_records_url']
-
-        headers = {
-            'Authorization': 'Bearer ' + access_token,
-            'Content-Encoding': 'gzip'
-        }
-
-        response = requests.get(instance_url + next_records_url, headers=headers)
-        return {'statusCode': 200, 'body': response.json()}
-    except Exception as err:
-        return {'statusCode': 405, 'body': str(err)}
+        return str(err), 405
 
 
 @app.post("/create_custom_object")
@@ -157,7 +131,6 @@ def create_custom_object():
 @app.route("/redirect")
 def redirect():
     return redirect(request.args.get("oauth_url"))
-
 
 @app.route("/login/callback")
 def callback():
