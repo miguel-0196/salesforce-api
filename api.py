@@ -29,9 +29,9 @@ def get_oauth_url():
     try:
         redirect_uri =  request.form['redirect_uri']
         url = "https://login.salesforce.com/services/oauth2/authorize?response_type=code&scope=refresh_token&client_id="+SALES_KEY+"&redirect_uri="+redirect_uri
-        return {'statusCode': 200, 'body': url}
+        return url
     except Exception as err:
-        return {'statusCode': 405, 'body': str(err)}
+        return str(err), 405
 
 @app.post("/login_oauth_callback")
 def login_oauth_callback():
@@ -39,17 +39,15 @@ def login_oauth_callback():
         redirect_uri =  request.form['redirect_uri']
         authorization_code =  request.form['authorization_code']
         uri_token_request = 'https://login.salesforce.com/services/oauth2/token'
-        response = requests.post(uri_token_request, data={
+        return requests.post(uri_token_request, data={
             'grant_type': 'authorization_code',
             'code': authorization_code,
             'client_id': SALES_KEY,
             'client_secret': SALES_SECRET,
             'redirect_uri': redirect_uri
         }).json()
-
-        return {'statusCode': 200, 'body': response}
     except Exception as err:
-        return {'statusCode': 405, 'body': str(err)}
+        return str(err), 405
 
 @app.post("/get_new_access_token")
 def get_new_access_token():
@@ -63,10 +61,9 @@ def get_new_access_token():
         }
 
         uri_token_request = 'https://login.salesforce.com/services/oauth2/token'
-        response = requests.post(uri_token_request, data=data).json()
-        return {'statusCode': 200, 'body': response}
+        return requests.post(uri_token_request, data=data).json()
     except Exception as err:
-        return {'statusCode': 405, 'body': str(err)}
+        return str(err), 405
 
 
 @app.post("/get_object_data")
@@ -122,9 +119,9 @@ def create_custom_object():
         )
         sf.mdapi.CustomObject.create(custom_object)
     
-        return {'statusCode': 200, 'body': 'Success'}
+        return 'Created successfully'
     except Exception as err:
-        return {'statusCode': 405, 'body': str(err)}
+        return str(err), 405
 
 
 # Test route
