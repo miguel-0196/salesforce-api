@@ -75,9 +75,12 @@ def get_object_data():
         from_date = request.form['from_date'] if 'from_date' in request.form else '' # 2024-02-06
         to_date = request.form['to_date'] if 'to_date' in request.form else ''
 
+        sf = Salesforce(instance_url=instance_url, session_id=access_token)
         custom_object = True if object_name.endswith('__c') else False
         if custom_object == True:
-            query = 'SELECT FIELDS(CUSTOM)'
+            meta = getattr(sf, object_name).describe()
+            fields = [field['name'] for field in meta['fields']]
+            query = 'SELECT ' + ', '.join(fields)
         else:
             query = 'SELECT FIELDS(STANDARD)'
 
@@ -88,7 +91,6 @@ def get_object_data():
         if to_date != '':
             query += f' AND LastModifiedDate<={to_date}T23:59:59Z'
 
-        sf = Salesforce(instance_url=instance_url, session_id=access_token)
         return sf.query_all(query)
     except Exception as err:
         return str(err), 405
