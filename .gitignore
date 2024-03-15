@@ -1,5 +1,4 @@
+.env
+googleapis.json
 __pycache__/
-*.pyc
-*Env
-*.zip
 venv
