@@ -3,3 +3,4 @@ Flask
 pyopenssl
 simple_salesforce
 python-dotenv
+google.cloud.bigquery
