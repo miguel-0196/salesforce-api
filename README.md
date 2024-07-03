@@ -1,3 +1,6 @@
+# Salesforce API
+![Salesforce](img/salesforce.png)
+
 This project provides the following APIs for salesforce integration:
 
 1. get_oauth_url:		get oauth url for salesforce login
